@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Events</title>
+    <link rel="stylesheet" type="text/css" href="css/redmond/jquery-ui-1.8.16.custom.css"/>
+    <link rel="stylesheet" type="text/css" href="js/jtable/themes/lightcolor/blue/jtable.css"/>
+    <script src="js/jquery/jquery.js"></script>
+    <script src="js/jquery-ui/jquery-ui.js"></script>
+    <script src="js/moment.min.js"></script>
+    <script src="js/jtable/jquery.jtable.js"></script>
+    <style type="text/css">
+        .ui-dialog {
+            z-index: 2;
+        }
+        .ui-widget-overlay {
+            z-index: 1;
+        }
+
+        #EventTableContainer, #EventParticipantTableContainer {
+            width: 100%;
+        }
+
+        .participantAvatar {
+            max-width: 48px;
+            max-height: 48px;
+        }
+    </style>
+</head>
+<body>
+<h1>Events</h1>
+<div id="EventTableContainer"></div>
+<script type="text/javascript">
+
+    $(function() {
+
+        //Prepare jTable
+        $('#EventTableContainer').jtable({
+            title: 'Event List',
+            actions: {
+                listAction: 'proc/events.php?action=list',
+                createAction: 'proc/events.php?action=create',
+                updateAction: 'proc/events.php?action=update',
+                deleteAction: 'proc/events.php?action=delete'
+            },
+            selecting: true,
+            paging: true,
+            pageSize: 2,
+            sorting: true,
+            defaultSorting: 'eventId ASC',
+            selectionChanged: function (event, data) {
+                var selectedRows = $('#EventTableContainer').jtable('selectedRows');
+                if (selectedRows.length > 0) {
+                    var firstRowEventId = $(selectedRows[0]).data('record-key');
+                    $('#EventParticipantTableContainer').data('eventid', firstRowEventId);
+                    $('#EventParticipantTableContainer').find('.jtable-title-text').text('Participants for Event #' + firstRowEventId);
+                    $('#EventParticipantTableContainer').jtable('load', {eventid: firstRowEventId});
+                }
+            },
+            fields: {
+                eventId: {
+                    title: '#',
+                    key: true,
+                    edit: false
+                },
+                organizerId: {
+                    title: 'Organizer',
+                    options: 'proc/get_select_list/organizer.php'
+                },
+                locationId: {
+                    title: 'Location',
+                    options: 'proc/get_select_list/location.php'
+                },
+                name: {
+                    title: 'Name'
+                },
+                description: {
+                    title: 'Description'
+                },
+                startTime: {
+                    title: 'Start Time',
+                    display: function (data) {
+                        return moment(data.record.startTime).format('DD/MM/YYYY HH:mm:ss');
+                    }
+                },
+                endTime: {
+                    title: 'End Time',
+                    display: function (data) {
+                        return moment(data.record.endTime).format('DD/MM/YYYY HH:mm:ss');
+                    }
+                },
+                lastUpdate: {
+                    title: 'Last Update',
+                    edit: false,
+                    display: function (data) {
+                        return moment(data.record.lastUpdate).format('DD/MM/YYYY HH:mm:ss');
+                    }
+                },
+                inChargeName: {
+                    title: 'I/C Name'
+                },
+                inChargePhone: {
+                    title: 'I/C Phone'
+                }
+            }
+        });
+
+        //Load person list from server
+        $('#EventTableContainer').jtable('load');
+
+    });
+
+</script>
+
+<hr width="100%" style="height: 1px;" />
+
+<div id="EventParticipantTableContainer"></div>
+<script type="text/javascript">
+
+    var participantImgRoot = "http://itd-moodle.ddns.net/2014fyp_ips/img/Participant/";
+
+    $(function() {
+
+        //Prepare jTable
+        $('#EventParticipantTableContainer').jtable({
+            title: 'Participants for Event (not selected)',
+            actions: {
+                listAction: function (postData, jtParams) {
+                    var eventId = $('#EventParticipantTableContainer').data('eventid');
+                    if (eventId === undefined || eventId === null || eventId.length == 0) return;
+                    postData['eventid'] = eventId;
+                    return $.Deferred(function ($dfd) {
+                        $.ajax({
+                            url: 'proc/eventId__participant.php?action=list&jtStartIndex=' + jtParams.jtStartIndex + '&jtPageSize=' + jtParams.jtPageSize + '&jtSorting=' + jtParams.jtSorting + '',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: postData,
+                            success: function (data) {
+                                $dfd.resolve(data);
+                            },
+                            error: function () {
+                                $dfd.reject();
+                            }
+                        });
+                    });
+                },
+                createAction: function (postData) {
+                    var eventId = $('#EventParticipantTableContainer').data('eventid');
+                    console.log(eventId);
+                    if (eventId === undefined || eventId === null || eventId.length == 0) return;
+                    postData += '&eventid=' + eventId;
+                    console.log(typeof postData);
+                    return $.Deferred(function ($dfd) {
+                        $.ajax({
+                            url: 'proc/eventId__participant.php?action=create',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: postData,
+                            success: function (data) {
+                                $dfd.resolve(data);
+                            },
+                            error: function () {
+                                $dfd.reject();
+                            }
+                        });
+                    });
+                },
+                deleteAction: function (postData) {
+                    console.log(postData);
+                    var eventId = $('#EventParticipantTableContainer').data('eventid');
+                    if (eventId === undefined || eventId === null || eventId.length == 0) return;
+                    postData['eventid'] = eventId;
+                    return $.Deferred(function ($dfd) {
+                        $.ajax({
+                            url: 'proc/eventId__participant.php?action=delete',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: postData,
+                            success: function (data) {
+                                $dfd.resolve(data);
+                            },
+                            error: function () {
+                                $dfd.reject();
+                            }
+                        });
+                    });
+                }
+            },
+            selecting: false,
+            paging: true,
+            pageSize: 2,
+            sorting: true,
+            defaultSorting: 'participantId ASC',
+            fields: {
+                pid: {
+                    list: false,
+                    create: true,
+                    options: 'proc/get_select_list/participant.php'
+                },
+                photo: {
+                    title: '',
+                    create: false,
+                    edit: false,
+                    display: function(data) {
+                        return '<img class="participantAvatar" src="' + participantImgRoot + '/' + data.record.photo + '" />'
+                    }
+                },
+                participantId: {
+                    title: '#',
+                    key: true,
+                    create: false,
+                    edit: false
+                },
+                name: {
+                    title: 'Name',
+                    create: false,
+                    edit: false
+                },
+                phone: {
+                    title: 'Phone',
+                    create: false,
+                    edit: false
+                },
+                gender: {
+                    title: 'Gender',
+                    create: false,
+                    edit: false
+                },
+                address: {
+                    title: 'Address',
+                    create: false,
+                    edit: false
+                },
+                emergencyName: {
+                    title: 'Emg. Name',
+                    create: false,
+                    edit: false
+                },
+                emergencyPhone: {
+                    title: 'Emg. Phone',
+                    create: false,
+                    edit: false
+                }
+            }
+        });
+
+        //Load person list from server
+        //$('#EventParticipantTableContainer').jtable('load');
+
+    });
+
+</script>
+</body>
+</html>
