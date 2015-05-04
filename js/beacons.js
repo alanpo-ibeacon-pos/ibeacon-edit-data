@@ -46,7 +46,7 @@ function parseCsvBeacons(lines) {
         var major = parseInt(cols[1].trim());
         var minor = parseInt(cols[2].trim());
 
-        if (uuid.length === 0 || isNaN(major) || isNaN(minor)) throw 'Incorrect parsed CSV row format.';
+        if (uuid.length === 0 || isNaN(major) || isNaN(minor)) throw 'Incorrect parsed data format.';
 
         doms.push({"uuid": uuid, "major": major, "minor": minor});
     }
@@ -81,11 +81,9 @@ function insertBeacon() {
 
     var beacons = null;
     try {
-        beacons = parseCsvBeacons([$('input#inUuid').val() + ',' +
-                                      $('input#inMajor').val() + ',' +
-                                      $('input#inMinor').val()]);
+        beacons = parseCsvBeacons([uuid + ',' + major + ',' + minor]);
     } catch (e) {
-        setBeaconError(e.message);
+        setBeaconError(e);
         return;
     }
 
