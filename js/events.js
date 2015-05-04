@@ -1,5 +1,21 @@
 var participantImgRoot = "http://itd-moodle.ddns.net/2014fyp_ips/img/Participant/";
 
+function fieldDateTimePicker(name, data, sec) {
+    sec = typeof sec === 'number' && sec > -1 && sec < 60 ? sec : 0;
+
+    var val = '';
+    try { val = data.record[name]; } catch (e) {}
+    return $('<input type="text"/>')
+        .attr('id', 'Edit-' + name)
+        .attr('name', name)
+        .val(val)
+        .datetimepicker({
+            format: 'Y-m-d H:i:' + (sec < 10 ? '0' + sec : sec),
+            lang: 'en',
+            mask: true
+    });
+}
+
 $(function() {
 
     //Prepare jTable
@@ -20,15 +36,17 @@ $(function() {
             var selectedRows = $('#EventTableContainer').jtable('selectedRows');
             if (selectedRows.length > 0) {
                 var firstRowEventId = $(selectedRows[0]).data('record-key');
-                $('#EventParticipantTableContainer').data('eventid', firstRowEventId);
-                $('#EventParticipantTableContainer').find('.jtable-title-text').text('Participants for Event #' + firstRowEventId);
-                $('#EventParticipantTableContainer').jtable('load', {eventid: firstRowEventId});
+                $('#EventParticipantTableContainer')
+                    .data('eventid', firstRowEventId)
+                    .find('.jtable-title-text').text('Participants for Event #' + firstRowEventId)
+                    .jtable('load', {eventid: firstRowEventId});
             }
         },
         fields: {
             eventId: {
                 title: '#',
                 key: true,
+                create: false,
                 edit: false
             },
             organizerId: {
@@ -48,20 +66,27 @@ $(function() {
             startTime: {
                 title: 'Start Time',
                 display: function (data) {
-                    return moment(data.record.startTime).format('DD/MM/YYYY HH:mm:ss');
+                    return moment(data.record.startTime).format('YYYY-MM-DD HH:mm:ss');
+                },
+                input: function (data) {
+                    return fieldDateTimePicker('startTime', data);
                 }
             },
             endTime: {
                 title: 'End Time',
                 display: function (data) {
-                    return moment(data.record.endTime).format('DD/MM/YYYY HH:mm:ss');
+                    return moment(data.record.endTime).format('YYYY-MM-DD HH:mm:ss');
+                },
+                input: function (data) {
+                    return fieldDateTimePicker('endTime', data, 59);
                 }
             },
             lastUpdate: {
                 title: 'Last Update',
+                create: false,
                 edit: false,
                 display: function (data) {
-                    return moment(data.record.lastUpdate).format('DD/MM/YYYY HH:mm:ss');
+                    return moment(data.record.lastUpdate).format('YYYY-MM-DD HH:mm:ss');
                 }
             },
             inChargeName: {

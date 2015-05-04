@@ -13,7 +13,7 @@ try
 		$row = $result->fetch_assoc();
 		$recordCount = $row['RecordCount'];
 
-		//Get records from database
+        //Get records from database
 		$result = $db->query("SELECT * FROM event ORDER BY " . $_GET["jtSorting"] . " LIMIT " . $_GET["jtStartIndex"] . ", " . $_GET["jtPageSize"] . "");
 
 		//Add all records to an array
@@ -35,22 +35,19 @@ try
 	//Creating a new record (createAction)
 	else if($_GET["action"] == "create")
 	{
+        $newIdx = $db->query('SELECT CONVERT(SUBSTR(MAX(eventId), 2), UNSIGNED) + 1 FROM event')->fetch_row()[0];
+        $newID = 'E' . str_pad($newIdx, 7, '0', STR_PAD_LEFT);
+
 		//Insert record into database
-		$stmt = $db->prepare("INSERT INTO traces(eventId, organizerId, locationId, name, description, startTime, endTime, lastUpdate, inChargeName, inChargePhone)
-                              VALUES(:eventId, :organizerId, :locationId, :name, :description, :startTime, :endTime, now(), :inChargeName, :inChargePhone)");
-		$stmt->execute(array(
-			':eventId' => $_POST["eventId"],
-			':organizerId' => $_POST["organizerId"],
-			':locationId' => $_POST["locationId"],
-			':name' => $_POST["name"],
-			':description' => $_POST["description"],
-			':startTime' => $_POST["startTime"],
-			':endTime' => $_POST["endTime"],
-			':inChargeName' => $_POST["inChargeName"],
-			':inChargePhone' => $_POST["inChargePhone"]));
+		$stmt = $db->prepare("INSERT INTO event(eventId, organizerId, locationId, name, description, startTime, endTime, inChargeName, inChargePhone)
+                              VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param('sssssssss',
+            $newID, $_POST["organizerId"], $_POST["locationId"], $_POST["name"], $_POST["description"],
+            $_POST["startTime"], $_POST["endTime"], $_POST["inChargeName"], $_POST["inChargePhone"]);
+		if (!$stmt->execute()) throw new Exception($stmt->error);
 
 		//Get last inserted record (to return to jTable)
-		$result = $db->query("SELECT * FROM event WHERE PersonId = LAST_INSERT_ID();");
+		$result = $db->query("SELECT * FROM event WHERE eventId = LAST_INSERT_ID();");
 		$row = $result->fetch_assoc();
 
 		//Return result to jTable
@@ -65,19 +62,12 @@ try
 	else if($_GET["action"] == "update")
 	{
 		//Update record in database
-		$stmt = $db->prepare("UPDATE event SET organizerId = :organzerId, locationId = :locationId, name = :name, description = :description,
-                              startTime = :startTime, endTime = :endTime, lastUpdate = now(), inChargeName = :inChargeName, inChargePhone = :inChargePhone WHERE eventId = :eventId");
-		$stmt->execute(array(
-			':organizerId' => $_POST["organizerId"],
-			':locationId' => $_POST["locationId"],
-			':name' => $_POST["name"],
-			':description' => $_POST["description"],
-			':startTime' => $_POST["startTime"],
-			':endTime' => $_POST["endTime"],
-			':lastUpdate' => $_POST["lastUpdate"],
-			':inChargeName' => $_POST["inChargeName"],
-			':inChargePhone' => $_POST["inChargePhone"],
-			':eventId' => $_POST["eventId"]));
+		$stmt = $db->prepare("UPDATE event SET organizerId = ?, locationId = ?, name = ?, description = ?,
+                              startTime = ?, endTime = ?, inChargeName = ?, inChargePhone = ? WHERE eventId = ?");
+        $stmt->bind_param('sssssssss',
+            $_POST["organizerId"], $_POST["locationId"], $_POST["name"], $_POST["description"],
+            $_POST["startTime"], $_POST["endTime"], $_POST["inChargeName"], $_POST["inChargePhone"], $_POST['eventId']);
+        if (!$stmt->execute()) throw new Exception($stmt->error);
 
 		//Return result to jTable
 		$jTableResult = array();
@@ -90,8 +80,9 @@ try
 	else if($_GET["action"] == "delete")
 	{
 		//Delete from database
-		$stmt = $db->prepare("DELETE FROM event WHERE eventId = :eventId");
-		$stmt->execute(array(':eventId' => $_POST["eventId"]));
+		$stmt = $db->prepare("DELETE FROM event WHERE eventId = ?");
+        $stmt->bind_param('s', $_POST['eventId']);
+        if (!$stmt->execute()) throw new Exception($stmt->error);
 
 		//Return result to jTable
 		$jTableResult = array();

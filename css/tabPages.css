@@ -5,9 +5,6 @@ body{
 h1 {
     line-height: 1em;
 }
-select {
-    width: 200px;
-}
 #tabs {
     position: absolute;
     width: 95vw;
