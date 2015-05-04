@@ -1,0 +1,32 @@
+#batch-input {
+    width: 95%;
+}
+.previewBeaconItem {
+    border: 1px #999 solid;
+    background: #ccc;
+}
+.previewBeaconItem * {
+    float: none;
+}
+.previewBeaconItem > .uuid, .previewBeaconItem > .major, .previewBeaconItem > .minor {
+    font-family: "Consolas", monospace;
+}
+.previewBeaconItem > .uuid {
+    font-weight: bold;
+    font-size: 14px;
+}
+.previewBeaconItem > .major:before {
+    content: "M: ";
+}
+.previewBeaconItem > .minor:before {
+    content: "m: ";
+}
+button#import, button#insert {
+    float: right;
+    border: 2px #ffcc00 solid;
+    font-size: 1.25em;
+}
+
+#beaconErrorArea, #beaconAlertArea {
+    display: none;
+}

@@ -1,0 +1,56 @@
+body{
+    font: 62.5% "Trebuchet MS", sans-serif;
+    margin: 50px;
+}
+h1 {
+    line-height: 1em;
+}
+select {
+    width: 200px;
+}
+#tabs {
+    position: absolute;
+    width: 90vw;
+    margin-bottom: 50px;
+}
+#tabs > .ui-tabs-panel {
+    overflow-y: auto;
+    height: 80vh;
+}
+.floatLeft {
+    float: left;
+}
+.floatRight {
+    float: right;
+}
+.clear {
+    clear: both;
+}
+.w50 {
+    width: 50%;
+}
+.w100 {
+    width: 100%;
+}
+.h300px {
+    height: 300px;
+}
+.f1em5 {
+    font-size: 1.5em;
+}
+
+.formSection {
+    padding: 10px;
+    border: 1px #1c94c4 solid;
+    border-radius: 5px;
+    margin-top: 16px;
+}
+
+.formSection > .formTitle:first-child {
+    display: block;
+    color: #1c94c4;
+    margin-top: -20px;
+    padding: 0 4px;
+    font-size: 16px;
+    background: #eee;
+}

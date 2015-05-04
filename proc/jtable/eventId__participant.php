@@ -22,11 +22,10 @@ try
         $recordCount = $row['RecordCount'];
 
         //Get records from database
-        $st = "SELECT * FROM participant
+        $stmt = $db->prepare("SELECT * FROM participant
                               INNER JOIN participant_Event ON participant.participantId = participant_Event.participantId
                               WHERE participant_Event.eventId = ?
-                              ORDER BY participant." . $_GET["jtSorting"] . " LIMIT " . $_GET["jtStartIndex"] . ", " . $_GET["jtPageSize"] . "";
-        $stmt = $db->prepare($st);
+                              ORDER BY participant." . $_GET["jtSorting"] . " LIMIT " . $_GET["jtStartIndex"] . ", " . $_GET["jtPageSize"] . "");
         $stmt->bind_param('s', $_POST["eventid"]);
         $stmt->execute();
         if ($stmt->error) throw new Exception($stmt->error);
@@ -59,7 +58,7 @@ try
         if ($stmt->error) throw new Exception($stmt->error);
 
         //Get last inserted record (to return to jTable)
-        $result = $db->query("SELECT * FROM participant WHERE participantId = LAST_INSERT_ID();");
+        $result = $db->query("SELECT * FROM participant WHERE participantId = LAST_INSERT_ID()");
         $row = $result->fetch_assoc();
 
         //Return result to jTable

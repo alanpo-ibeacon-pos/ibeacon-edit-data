@@ -1,0 +1,21 @@
+hr {
+    height: 1px;
+}
+th.jtable-column-header {
+    overflow-x: hidden;
+}
+.ui-dialog {
+    z-index: 2;
+}
+.ui-widget-overlay {
+    z-index: 1;
+}
+
+#EventTableContainer, #EventParticipantTableContainer {
+    width: 100%;
+}
+
+.participantAvatar {
+    max-width: 48px;
+    max-height: 48px;
+}
