@@ -1,6 +1,6 @@
 body{
     font: 62.5% "Trebuchet MS", sans-serif;
-    margin: 50px;
+    margin: 20px;
 }
 h1 {
     line-height: 1em;
@@ -10,7 +10,7 @@ select {
 }
 #tabs {
     position: absolute;
-    width: 90vw;
+    width: 95vw;
     margin-bottom: 50px;
 }
 #tabs > .ui-tabs-panel {

@@ -1,17 +1,20 @@
-$("#tryParse").button().click(previewCsvBeacons);
-$("#import").button().click(importCsvBeacons);
-$("#insert").button();
-
 function previewCsvBeacons() {
     setBeaconError(null);
 
     try {
-        var csvLines = $('#batch-input').val().split(/\r\n|\r|\n/);
+        var inStr = $('#batch-input').val();
+
+        if (inStr.length === 0) {
+            throw 'Data input field has nothing.';
+        }
+
+        var csvLines = inStr.split(/\r\n|\r|\n/);
         // UUID, major, minor
         // no title row
         var beacons = parseCsvBeacons(csvLines);
     } catch (e) {
-        setBeaconError(e.message);
+        setBeaconError(e);
+        return;
     }
 
     $('#form-batch-ibeacon').data('beacons', beacons);
@@ -38,7 +41,14 @@ function parseCsvBeacons(lines) {
     for (var i in lines) {
         var ln = lines[i];
         var cols = ln.split(',');
-        doms.push({"uuid": cols[0].trim(), "major": parseInt(cols[1].trim()), "minor": parseInt(cols[2].trim())});
+
+        var uuid = cols[0].trim();
+        var major = parseInt(cols[1].trim());
+        var minor = parseInt(cols[2].trim());
+
+        if (uuid.length === 0 || isNaN(major) || isNaN(minor)) throw 'Incorrect parsed CSV row format.';
+
+        doms.push({"uuid": uuid, "major": major, "minor": minor});
     }
     return doms;
 }
@@ -49,6 +59,33 @@ function importCsvBeacons() {
     var beacons = $('#form-batch-ibeacon').data('beacons');
     if (!beacons) {
         setBeaconError("No try-parsed beacons. Please press \"Parse\" first.");
+        return;
+    }
+
+    var postParam = $.param({
+        do: 'insert',
+        data: JSON.stringify(beacons)
+    });
+    $.ajax('proc/beacon.php', {type: 'POST', data: postParam})
+        .done(function(data, textStatus, jqXHR) {
+            setBeaconAlert("Successfully added " + beacons.length + " new iBeacons into database.")
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR, textStatus, errorThrown);
+            setBeaconError(jqXHR.responseText);
+        });
+}
+
+function insertBeacon() {
+    setBeaconError(null);
+
+    var beacons = null;
+    try {
+        beacons = parseCsvBeacons([$('input#inUuid').val() + ',' +
+                                      $('input#inMajor').val() + ',' +
+                                      $('input#inMinor').val()]);
+    } catch (e) {
+        setBeaconError(e.message);
         return;
     }
 
@@ -92,3 +129,10 @@ function setBeaconAlert(msg) {
         ctrln.hide();
     }
 }
+
+$.getScript("js/__beacon_tmpl.js", function() {
+    insertBeaconContext('#tab-beacon');
+    $("#tryParse").button().click(previewCsvBeacons);
+    $("#import").button().click(importCsvBeacons);
+    $("#insert").button().click(insertBeacon);
+});
