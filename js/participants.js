@@ -1,13 +1,31 @@
 function fieldImageUpload() {
-    var context = '<input id="imageUpload" type="file" name="files[]" data-url="server/php/" multiple>';
+    var context = '<input id="imageUpload" type="file" name="files[]" data-url="proc/file-in/" multiple>';
 
     return $(context)
         .fileupload({
             dataType: 'json',
-            done: function (e, data) {
+            add: function(e, data) {
+                console.log('added');
+                data.submit();
+            },
+            done: function(e, data) {
                 $.each(data.result.files, function (index, file) {
-                    $('<p/>').text(file.name).appendTo(document.body);
+                    $('.previewPane img.participantAvatar')
+                        .attr('src', participantImgRoot + '/' + file.name)
+                        .data('delUrl', file.deleteUrl)
+                        .data('delType', file.deleteType);;
+                    $('form#jtable-edit-form input[name=photo]').val(file.name);
                 });
+            },
+            progressall: function(e, data) {
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+
+                console.log(progress);
+
+                $('#progress .progress-bar').css(
+                    'width',
+                    progress + '%'
+                );
             }
         });
 }
@@ -25,7 +43,7 @@ $(function() {
         },
         selecting: false,
         paging: true,
-        pageSize: 2,
+        pageSize: 10,
         sorting: true,
         defaultSorting: 'participantId ASC',
         fields: {
@@ -34,10 +52,38 @@ $(function() {
                 sorting: false,
                 width: '1%',
                 display: function(data) {
-                    return '<img class="participantAvatar" src="' + participantImgRoot + '/' + data.record.photo + '" />'
+                    return fieldParticipantImage(data.record.photo);
                 },
                 input: function(data) {
-                    return fieldImageUpload() + '';
+                    var input = $('<input>')
+                        .attr('type', 'hidden')
+                        .attr('name', 'photo');
+                    data && data.record && data.record.photo && input.val(data.record.photo);
+
+                    var previewPaneImg = null;
+                    if (data && data.record && data.record.photo)
+                        previewPaneImg = fieldParticipantImage(data.record.photo);
+                    else
+                        previewPaneImg = fieldParticipantImage();
+
+
+                    var ret = $('<div>')
+                        .toggleClass('editParticipantPhoto')
+                        .append(input)
+                        .append($('<div>')
+                            .toggleClass('previewPane')
+                            .append(previewPaneImg))
+                        .append($('<div>')
+                            .toggleClass('jtable-input-label')
+                            .html('Upload new avatar'))
+                        .append(fieldImageUpload())
+                        .append($('<div>')
+                            .attr('id','progress')
+                            .toggleClass('progress')
+                            .append($('<div>')
+                                .toggleClass('progress-bar progress-bar-success')));
+
+                    return ret;
                 }
             },
             participantId: {

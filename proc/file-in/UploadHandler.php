@@ -126,14 +126,12 @@ class UploadHandler
                 '' => array(
                     // Automatically rotate images based on EXIF meta data:
                     'auto_orient' => true
-                ),
+                )/*,
                 // Uncomment the following to create medium sized images:
-                /*
                 'medium' => array(
                     'max_width' => 800,
                     'max_height' => 600
                 ),
-                */
                 'thumbnail' => array(
                     // Uncomment the following to use a defined directory for the thumbnails
                     // instead of a subdirectory based on the version identifier.
@@ -147,7 +145,7 @@ class UploadHandler
                     //'crop' => true,
                     'max_width' => 80,
                     'max_height' => 80
-                )
+                )*/
             ),
             'print_response' => true
         );
@@ -184,7 +182,7 @@ class UploadHandler
         }
     }
 
-    protected function get_full_url() {
+    public static function get_full_url() {
         $https = !empty($_SERVER['HTTPS']) && strcasecmp($_SERVER['HTTPS'], 'on') === 0 ||
             !empty($_SERVER['HTTP_X_FORWARDED_PROTO']) &&
                 strcasecmp($_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') === 0;

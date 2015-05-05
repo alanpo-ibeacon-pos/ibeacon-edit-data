@@ -9,12 +9,12 @@ try
     if($_GET["action"] == "list")
     {
         //Get record count
-        $result = $db->query("SELECT COUNT(1) AS RecordCount FROM participant");
+        $result = $db->query("SELECT COUNT(1) AS RecordCount FROM location");
         $row = $result->fetch_assoc();
         $recordCount = $row['RecordCount'];
 
         //Get records from database
-        $result = $db->query("SELECT * FROM participant ORDER BY " . $_GET["jtSorting"] . " LIMIT " . $_GET["jtStartIndex"] . ", " . $_GET["jtPageSize"] . "");
+        $result = $db->query("SELECT * FROM location ORDER BY " . $_GET["jtSorting"] . " LIMIT " . $_GET["jtStartIndex"] . ", " . $_GET["jtPageSize"] . "");
 
         //Add all records to an array
         $rows = array();
@@ -35,19 +35,16 @@ try
     //Creating a new record (createAction)
     else if($_GET["action"] == "create")
     {
-        $newIdx = $db->query('SELECT CONVERT(SUBSTR(MAX(participantId), 2), UNSIGNED) + 1 FROM participant')->fetch_row()[0];
-        $newID = 'P' . str_pad($newIdx, 7, '0', STR_PAD_LEFT);
+        $newIdx = $db->query('SELECT CONVERT(SUBSTR(MAX(locationId), 4), UNSIGNED) + 1 FROM location')->fetch_row()[0];
+        $newID = 'LOC' . str_pad($newIdx, 5, '0', STR_PAD_LEFT);
 
         //Insert record into database
-        $stmt = $db->prepare("INSERT INTO participant(participantId, name, phone, gender, address, photo, emergenceyName, emergencyPhone)
-                              VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param('ssssssss',
-            $newID, $_POST["name"], $_POST["phone"], $_POST["gender"], $_POST["address"],
-            $_POST["photo"], $_POST["emergencyName"], $_POST["emergencyPhone"]);
+        $stmt = $db->prepare("INSERT INTO location(locationId, name) VALUES (?, ?)");
+        $stmt->bind_param('ss',$newID, $_POST["name"]);
         if (!$stmt->execute()) throw new Exception($stmt->error);
 
         //Get last inserted record (to return to jTable)
-        $result = $db->query("SELECT * FROM event WHERE eventId = LAST_INSERT_ID()");
+        $result = $db->query("SELECT * FROM location WHERE locationId = LAST_INSERT_ID()");
         $row = $result->fetch_assoc();
 
         //Return result to jTable
@@ -62,10 +59,9 @@ try
     else if($_GET["action"] == "update")
     {
         //Update record in database
-        $stmt = $db->prepare("UPDATE participant SET name = ?, phone = ?, gender = ?, address = ?, photo = ?, emergencyName = ?, emergencyPhone = ? WHERE participantId = ?");
-        $stmt->bind_param('ssssssss',
-            $_POST["name"], $_POST["phone"], $_POST["gender"], $_POST["address"],
-            $_POST["photo"], $_POST["emergencyName"], $_POST["emergencyPhone"], $_POST["participantId"]);
+        $stmt = $db->prepare("UPDATE location SET name = ? WHERE locationId = ?");
+        $stmt->bind_param('ss',
+            $_POST["name"], $_POST["locationId"]);
         if (!$stmt->execute()) throw new Exception($stmt->error);
 
         //Return result to jTable
@@ -79,8 +75,8 @@ try
     else if($_GET["action"] == "delete")
     {
         //Delete from database
-        $stmt = $db->prepare("DELETE FROM participant WHERE participantId = ?");
-        $stmt->bind_param('s', $_POST["participantId"]);
+        $stmt = $db->prepare("DELETE FROM location WHERE locationId = ?");
+        $stmt->bind_param('s', $_POST["locationId"]);
         if (!$stmt->execute()) throw new Exception($stmt->error);
 
         //Return result to jTable

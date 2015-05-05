@@ -1,5 +1,8 @@
 <?php
-// SELECT * FROM participant p INNER JOIN participant_Event pe ON p.participantId = pe.participantId WHERE pe.eventId = "E0000001"
+
+require_once('../cred.php');
+$organizerId = Credentials::getOrganizerId();
+
 try
 {
     if (empty($_POST["participantId"])) throw new Exception('No "participantId" POST param is given.');
@@ -12,19 +15,21 @@ try
     {
 
         //Get record count
-        $stmt = $db->prepare("SELECT COUNT(1) AS RecordCount FROM participant_iBeacon
-                              WHERE participantId = ?");
-        $stmt->bind_param('s', $_POST["participantId"]);
+        $stmt = $db->prepare("SELECT COUNT(1) AS RecordCount FROM participant_iBeacon pi
+                              INNER JOIN organizer_ibeacon io ON pi.iBeaconId = io.iBeaconId
+                              WHERE pi.participantId = ? AND io.organizerId = ?");
+        $stmt->bind_param('ss', $_POST["participantId"], $organizerId);
         $stmt->execute();
         $result = $stmt->get_result();
         $row = $result->fetch_assoc();
         $recordCount = $row['RecordCount'];
 
         //Get records from database
-        $stmt = $db->prepare("SELECT iBeacon.iBeaconId, HEX(iBeacon.uuid), iBeacon.major, iBeacon.minor FROM iBeacon
-                              INNER JOIN participant_iBeacon ON iBeacon.iBeaconId = participant_iBeacon.iBeaconId
-                              WHERE participant_iBeacon.participantId = ?");
-        $stmt->bind_param('s', $_POST["participantId"]);
+        $stmt = $db->prepare("SELECT i.iBeaconId, HEX(i.uuid) AS uuid, i.major, i.minor FROM iBeacon i
+                              INNER JOIN participant_iBeacon pi ON i.iBeaconId = pi.iBeaconId
+                              INNER JOIN organizer_ibeacon io ON pi.iBeaconId = io.iBeaconId
+                              WHERE pi.participantId = ? AND io.organizerId = ?");
+        $stmt->bind_param('ss', $_POST["participantId"], $organizerId);
         $stmt->execute();
         if ($stmt->error) throw new Exception($stmt->error);
         $result = $stmt->get_result();
@@ -50,13 +55,13 @@ try
     {
         //Insert record into database
         $stmt = $db->prepare("INSERT INTO participant_iBeacon (participantId, iBeaconId) VALUES(?, ?)");
-        $stmt->bind_param('ss', $_POST["participantId"], $_POST["iBeaconId"]);
+        $stmt->bind_param('ss', $_POST["participantId"], $_POST["c_iBeaconId"]);
         $stmt->execute();
         if ($stmt->error) throw new Exception($stmt->error);
 
         //Get last inserted record (to return to jTable)
         $stmt = $db->prepare("SELECT * FROM participant_iBeacon WHERE participantId = ? AND iBeaconId = ?");
-        $stmt->bind_param('ss', $_POST["participantId"], $_POST["iBeaconId"]);
+        $stmt->bind_param('ss', $_POST["participantId"], $_POST["c_iBeaconId"]);
         $stmt->execute();
         if ($stmt->error) throw new Exception($stmt->error);
         $result = $stmt->get_result();

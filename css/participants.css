@@ -1,0 +1,26 @@
+.editParticipantPhoto .previewPane {
+    border: 1px #ccc solid;
+    width: 175px;
+    height: 175px;
+    margin: 0 auto;
+    text-align: center;
+}
+.editParticipantPhoto .previewPane .participantAvatar {
+    max-width: 175px;
+    max-height: 175px;
+}
+
+.progress {
+    height: 4px;
+    overflow: hidden;
+    background-color: #F5F5F5;
+}
+
+.progress-bar-success {
+    background-color: #5CB85C;
+    height: 4px;
+}
+
+em.tiny {
+    color: #f60;
+}

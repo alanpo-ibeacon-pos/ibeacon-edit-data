@@ -7,6 +7,7 @@
  *  BAD:  http response 500 == error + content for err msg
  */
 
+require_once('cred.php');
 $db = null;
 
 try {
@@ -24,12 +25,15 @@ try {
     //Insert record into database
     $stmt = $db->prepare("INSERT INTO iBeacon (iBeaconId, uuid, major, minor) VALUES (?, ?, ?, ?)");
     $stmt->bind_param('ssii', $newID, $i_uuid, $i_major, $i_minor);
+    $stmt2 = $db->prepare("INSERT INTO organizer_ibeacon (iBeaconId, organizerId) VALUES (?, ?)");
+    $stmt2->bind_param('ss', $newID, Credentials::getOrganizerId());
     foreach ($in as $bcn) {
         $newID = 'B' . str_pad($newIdx++, 7, '0', STR_PAD_LEFT);
         $i_uuid = pack("H*", $bcn->uuid);
         $i_major = $bcn->major;
         $i_minor = $bcn->minor;
         $stmt->execute();
+        $stmt2->execute();
         if ($stmt->error) throw new Exception($stmt->error);
     }
     $db->commit();

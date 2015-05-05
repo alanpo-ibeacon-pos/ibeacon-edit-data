@@ -1,5 +1,3 @@
-var participantImgRoot = "http://itd-moodle.ddns.net/2014fyp_ips/img/Participant/";
-
 function fieldDateTimePicker(name, data, sec) {
     sec = typeof sec === 'number' && sec > -1 && sec < 60 ? sec : 0;
 
@@ -29,7 +27,7 @@ $(function() {
         },
         selecting: true,
         paging: true,
-        pageSize: 2,
+        pageSize: 10,
         sorting: true,
         defaultSorting: 'eventId ASC',
         selectionChanged: function (event, data) {
@@ -38,8 +36,8 @@ $(function() {
                 var firstRowEventId = $(selectedRows[0]).data('record-key');
                 $('#EventParticipantTableContainer')
                     .data('eventid', firstRowEventId)
-                    .find('.jtable-title-text').text('Participants for Event #' + firstRowEventId)
-                    .jtable('load', {eventid: firstRowEventId});
+                    .jtable('load', {eventid: firstRowEventId})
+                    .find('.jtable-title-text').text('Participants for Event #' + firstRowEventId);
             }
         },
         fields: {
@@ -96,10 +94,7 @@ $(function() {
                 title: 'I/C Phone'
             }
         }
-    });
-
-    //Load person list from server
-    $('#EventTableContainer').jtable('load');
+    }).jtable('load');
 
     //Prepare jTable
     $('#EventParticipantTableContainer').jtable({
@@ -168,7 +163,7 @@ $(function() {
         },
         selecting: false,
         paging: true,
-        pageSize: 2,
+        pageSize: 10,
         sorting: true,
         defaultSorting: 'participantId ASC',
         fields: {
@@ -180,7 +175,7 @@ $(function() {
                 width: '1%',
                 display: function (item) {
                     //Create an image that will be used to open child table
-                    var $img = $('<img class="participant-beacon-opener" src="img/bluetooth.gif" title="Check iBeacons bound to this participant" />');
+                    var $img = $('<img class="participant-beacon-opener" src="img/ui/bluetooth.gif" title="Check iBeacons bound to this participant" />');
                     //Open child table when user clicks the image
                     $img.click(function () {
                         var openedFromRow = $('#EventParticipantTableContainer').data('openedChildTableFromRow');
@@ -217,7 +212,7 @@ $(function() {
                                         postData += '&participantId=' + item.record.participantId;
                                         return $.Deferred(function ($dfd) {
                                             $.ajax({
-                                                url: 'proc/jtable/eventId__participant.php?action=create',
+                                                url: 'proc/jtable/participantId__ibeacon.php?action=create',
                                                 type: 'POST',
                                                 dataType: 'json',
                                                 data: postData,
@@ -235,7 +230,7 @@ $(function() {
                                         postData += '&participantId=' + item.record.participantId;
                                         return $.Deferred(function ($dfd) {
                                             $.ajax({
-                                                url: 'proc/jtable/eventId__participant.php?action=delete',
+                                                url: 'proc/jtable/participantId__ibeacon.php?action=delete',
                                                 type: 'POST',
                                                 dataType: 'json',
                                                 data: postData,
@@ -299,7 +294,7 @@ $(function() {
                 sorting: false,
                 width: '1%',
                 display: function(data) {
-                    return '<img class="participantAvatar" src="' + participantImgRoot + '/' + data.record.photo + '" />'
+                    return fieldParticipantImage(data.record.photo);
                 }
             },
             participantId: {

@@ -15,7 +15,7 @@ th.jtable-column-header {
     width: 100%;
 }
 
-.participantAvatar {
+.jtable .participantAvatar {
     max-width: 48px;
     max-height: 48px;
 }
