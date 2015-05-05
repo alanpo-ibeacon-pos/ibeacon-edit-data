@@ -47,7 +47,7 @@ try
 		if (!$stmt->execute()) throw new Exception($stmt->error);
 
 		//Get last inserted record (to return to jTable)
-		$result = $db->query("SELECT * FROM event WHERE eventId = LAST_INSERT_ID();");
+		$result = $db->query("SELECT * FROM event WHERE eventId = LAST_INSERT_ID()");
 		$row = $result->fetch_assoc();
 
 		//Return result to jTable
@@ -105,5 +105,3 @@ catch(Exception $ex)
 	header('Content-Type: application/json');
 	print json_encode($jTableResult);
 }
-
-?>

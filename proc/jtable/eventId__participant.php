@@ -99,5 +99,3 @@ catch(Exception $ex)
     header('Content-Type: application/json');
     print json_encode($jTableResult);
 }
-
-?>
