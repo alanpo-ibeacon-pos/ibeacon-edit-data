@@ -1,5 +1,5 @@
 function fieldImageUpload() {
-    var context = '<input id="imageUpload" type="file" name="files[]" data-url="proc/file-in/" multiple>';
+    var context = '<input id="imageUpload" type="file" name="files[]" data-url="proc/file-in/" multiple />';
 
     return $(context)
         .fileupload({
@@ -13,8 +13,9 @@ function fieldImageUpload() {
                     $('.previewPane img.participantAvatar')
                         .attr('src', participantImgRoot + '/' + file.name)
                         .data('delUrl', file.deleteUrl)
-                        .data('delType', file.deleteType);;
-                    $('form#jtable-edit-form input[name=photo]').val(file.name);
+                        .data('delType', file.deleteType);
+                    console.log($('.editParticipantPhoto input[name=photo]'), file.name);
+                    $('.editParticipantPhoto input[name=photo]').val(file.name);
                 });
             },
             progressall: function(e, data) {

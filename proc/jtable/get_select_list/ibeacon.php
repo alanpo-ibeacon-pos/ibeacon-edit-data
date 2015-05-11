@@ -4,11 +4,11 @@ require_once('../../cred.php');
 $organizerId = Credentials::getOrganizerId();
 
 //Open database connection
-$db = new mysqli('localhost:3306', 'root', 'root', '2014fyp_ips');
+$db = $db = new mysqli('moodle-db.cndunymmm6cz.ap-southeast-1.rds.amazonaws.com:3306', '2014fyp_ips', 'alanpo2593', '2014fyp_ips');
 
 //Get records from database
 $stmt = $db->prepare("SELECT CONCAT(i.iBeaconId, ' (', HEX(uuid), ', ', major, ', ', minor, ')') AS DisplayText, i.iBeaconId AS Value FROM iBeacon i
-                      INNER JOIN organizer_ibeacon io ON i.iBeaconId = io.iBeaconId
+                      INNER JOIN organizer_iBeacon io ON i.iBeaconId = io.iBeaconId
                       WHERE io.organizerId = ?");
 $stmt->bind_param('s', $organizerId);
 $stmt->execute();

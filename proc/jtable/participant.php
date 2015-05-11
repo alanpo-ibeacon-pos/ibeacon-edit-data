@@ -3,7 +3,7 @@
 try
 {
     //Open database connection
-    $db = new mysqli('localhost:3306', 'root', 'root', '2014fyp_ips');
+    $db = $db = new mysqli('moodle-db.cndunymmm6cz.ap-southeast-1.rds.amazonaws.com:3306', '2014fyp_ips', 'alanpo2593', '2014fyp_ips');
 
     //Getting records (listAction)
     if($_GET["action"] == "list")
@@ -37,14 +37,16 @@ try
     {
         $newIdx = $db->query('SELECT CONVERT(SUBSTR(MAX(participantId), 2), UNSIGNED) + 1 FROM participant')->fetch_row()[0];
         $newID = 'P' . str_pad($newIdx, 7, '0', STR_PAD_LEFT);
+        unset($newIdx);
 
         //Insert record into database
-        $stmt = $db->prepare("INSERT INTO participant(participantId, name, phone, gender, address, photo, emergenceyName, emergencyPhone)
+        $stmt = $db->prepare("INSERT INTO participant(participantId, name, phone, gender, address, photo, emergencyName, emergencyPhone)
                               VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param('ssssssss',
+        if ($db->error) throw new Exception('db stmt: ' . $db->error);
+        $stmt->bind_param('ssisssss',
             $newID, $_POST["name"], $_POST["phone"], $_POST["gender"], $_POST["address"],
             $_POST["photo"], $_POST["emergencyName"], $_POST["emergencyPhone"]);
-        if (!$stmt->execute()) throw new Exception($stmt->error);
+        if (!$stmt->execute()) throw new Exception('stmt exec: ' . $stmt->error);
 
         //Get last inserted record (to return to jTable)
         $result = $db->query("SELECT * FROM event WHERE eventId = LAST_INSERT_ID()");

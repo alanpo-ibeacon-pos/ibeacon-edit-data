@@ -71,8 +71,8 @@ function importCsvBeacons() {
             setBeaconAlert("Successfully added " + beacons.length + " new iBeacons into database.")
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
+            setBeaconError(jqXHR.responseText || errorThrown);
             console.log(jqXHR, textStatus, errorThrown);
-            setBeaconError(jqXHR.responseText);
         });
 }
 
@@ -96,8 +96,8 @@ function insertBeacon() {
             setBeaconAlert("Successfully added " + beacons.length + " new iBeacons into database.")
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
+            setBeaconError(jqXHR.responseText || errorThrown);
             console.log(jqXHR, textStatus, errorThrown);
-            setBeaconError(jqXHR.responseText);
         });
 }
 

@@ -8,7 +8,7 @@ try
     if (empty($_POST["participantId"])) throw new Exception('No "participantId" POST param is given.');
 
     //Open database connection
-    $db = new mysqli('localhost:3306', 'root', 'root', '2014fyp_ips');
+    $db = new mysqli('moodle-db.cndunymmm6cz.ap-southeast-1.rds.amazonaws.com:3306', '2014fyp_ips', 'alanpo2593', '2014fyp_ips');
 
     //Getting records (listAction)
     if($_GET["action"] == "list")
@@ -16,10 +16,12 @@ try
 
         //Get record count
         $stmt = $db->prepare("SELECT COUNT(1) AS RecordCount FROM participant_iBeacon pi
-                              INNER JOIN organizer_ibeacon io ON pi.iBeaconId = io.iBeaconId
+                              INNER JOIN organizer_iBeacon io ON pi.iBeaconId = io.iBeaconId
                               WHERE pi.participantId = ? AND io.organizerId = ?");
+
         $stmt->bind_param('ss', $_POST["participantId"], $organizerId);
         $stmt->execute();
+        if ($stmt->error) throw new Exception('stmt err: ' . $stmt->error);
         $result = $stmt->get_result();
         $row = $result->fetch_assoc();
         $recordCount = $row['RecordCount'];
@@ -27,11 +29,11 @@ try
         //Get records from database
         $stmt = $db->prepare("SELECT i.iBeaconId, HEX(i.uuid) AS uuid, i.major, i.minor FROM iBeacon i
                               INNER JOIN participant_iBeacon pi ON i.iBeaconId = pi.iBeaconId
-                              INNER JOIN organizer_ibeacon io ON pi.iBeaconId = io.iBeaconId
+                              INNER JOIN organizer_iBeacon io ON pi.iBeaconId = io.iBeaconId
                               WHERE pi.participantId = ? AND io.organizerId = ?");
         $stmt->bind_param('ss', $_POST["participantId"], $organizerId);
         $stmt->execute();
-        if ($stmt->error) throw new Exception($stmt->error);
+        if ($stmt->error) throw new Exception('stmt err: ' . $stmt->error);
         $result = $stmt->get_result();
 
         //Add all records to an array

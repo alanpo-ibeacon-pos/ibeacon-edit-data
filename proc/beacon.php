@@ -17,18 +17,24 @@ try {
     $in = json_decode($json);
 
     //Open database connection
-    $db = new mysqli('localhost:3306', 'root', 'root', '2014fyp_ips');
+    $db = $db = new mysqli('moodle-db.cndunymmm6cz.ap-southeast-1.rds.amazonaws.com:3306', '2014fyp_ips', 'alanpo2593', '2014fyp_ips');
 
     $newIdx = $db->query('SELECT CONVERT(SUBSTR(MAX(iBeaconId), 2), UNSIGNED) + 1 FROM iBeacon')->fetch_row()[0];
 
     $db->autocommit(false);
     //Insert record into database
     $stmt = $db->prepare("INSERT INTO iBeacon (iBeaconId, uuid, major, minor) VALUES (?, ?, ?, ?)");
+    if ($db->error) throw new Exception('stmt fuur iBeacon: ' . $db->error);
     $stmt->bind_param('ssii', $newID, $i_uuid, $i_major, $i_minor);
-    $stmt2 = $db->prepare("INSERT INTO organizer_ibeacon (iBeaconId, organizerId) VALUES (?, ?)");
-    $stmt2->bind_param('ss', $newID, Credentials::getOrganizerId());
+
+    $stmt2 = $db->prepare("INSERT INTO organizer_iBeacon (iBeaconId, organizerId) VALUES (?, ?)");
+    if ($db->error) throw new Exception('stmt fuur iBeacon: ' . $db->error);
+    $stmt2->bind_param('ss', $newID, $oid);
+
+
     foreach ($in as $bcn) {
         $newID = 'B' . str_pad($newIdx++, 7, '0', STR_PAD_LEFT);
+        $oid = Credentials::getOrganizerId();
         $i_uuid = pack("H*", $bcn->uuid);
         $i_major = $bcn->major;
         $i_minor = $bcn->minor;

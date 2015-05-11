@@ -194,7 +194,7 @@ $(function() {
                                         postData = 'participantId=' + item.record.participantId;
                                         return $.Deferred(function ($dfd) {
                                             $.ajax({
-                                                url: 'proc/jtable/participantId__ibeacon.php?action=list&jtStartIndex=' + jtParams.jtStartIndex + '&jtPageSize=' + jtParams.jtPageSize + '&jtSorting=' + jtParams.jtSorting + '',
+                                                url: 'proc/jtable/participantId__ibeacon.php?action=list',
                                                 type: 'POST',
                                                 dataType: 'json',
                                                 data: postData,

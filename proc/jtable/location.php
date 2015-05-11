@@ -3,7 +3,7 @@
 try
 {
     //Open database connection
-    $db = new mysqli('localhost:3306', 'root', 'root', '2014fyp_ips');
+    $db = $db = new mysqli('moodle-db.cndunymmm6cz.ap-southeast-1.rds.amazonaws.com:3306', '2014fyp_ips', 'alanpo2593', '2014fyp_ips');
 
     //Getting records (listAction)
     if($_GET["action"] == "list")
