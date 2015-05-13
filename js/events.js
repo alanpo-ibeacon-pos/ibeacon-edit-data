@@ -49,17 +49,28 @@ $(function() {
             },
             organizerId: {
                 title: 'Organizer',
-                options: 'proc/jtable/get_select_list/organizer.php'
+                options: function(data) {
+                    data.clearCache();
+                    return 'proc/jtable/get_select_list/organizer.php';
+                }
             },
             locationId: {
                 title: 'Location',
-                options: 'proc/jtable/get_select_list/location.php'
+                options: function(data) {
+                    data.clearCache();
+                    return 'proc/jtable/get_select_list/location.php';
+                }
             },
             name: {
                 title: 'Name'
             },
             description: {
                 title: 'Description',
+                display: function (data) {
+                    return $('<div>')
+                        .css('height', '1.25em')
+                        .append($('<div>').toggleClass('overflow-hiding').text(data.record.description));
+                },
                 input: function (data) {
                     var inn = $('<textarea>')
                         .attr('name', 'description')
@@ -237,7 +248,7 @@ $(function() {
                                     },
                                     deleteAction: function (postData) {
                                         // already has iBeaconId since it's key
-                                        postData += '&participantId=' + item.record.participantId;
+                                        postData = $.param(postData) + '&participantId=' + item.record.participantId;
                                         return $.Deferred(function ($dfd) {
                                             $.ajax({
                                                 url: 'proc/jtable/participantId__ibeacon.php?action=delete',
@@ -259,7 +270,10 @@ $(function() {
                                         list: false,
                                         create: true,
                                         edit: false,
-                                        options: 'proc/jtable/get_select_list/ibeacon.php'
+                                        options: function(data) {
+                                            data.clearCache();
+                                            return 'proc/jtable/get_select_list/ibeacon.php';
+                                        }
                                     },
                                     iBeaconId: {
                                         key: true,
@@ -295,7 +309,10 @@ $(function() {
             pid: {
                 list: false,
                 create: true,
-                options: 'proc/jtable/get_select_list/participant.php'
+                options: function(data) {
+                    data.clearCache();
+                    return 'proc/jtable/get_select_list/participant.php';
+                }
             },
             photo: {
                 title: '',

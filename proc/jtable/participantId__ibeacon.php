@@ -85,6 +85,7 @@ try
         $stmt->bind_param('ss', $_POST["participantId"], $_POST["iBeaconId"]);
         $stmt->execute();
         if ($stmt->error) throw new Exception($stmt->error);
+        if ($db->error) throw new Exception($db->error);
 
         //Return result to jTable
         $jTableResult = array();

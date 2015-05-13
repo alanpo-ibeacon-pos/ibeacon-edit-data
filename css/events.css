@@ -1,12 +1,15 @@
 hr {
     height: 1px;
 }
+
 th.jtable-column-header {
     overflow-x: hidden;
 }
+
 .ui-dialog {
     z-index: 2;
 }
+
 .ui-widget-overlay {
     z-index: 1;
 }
@@ -18,4 +21,25 @@ th.jtable-column-header {
 .jtable .participantAvatar {
     max-width: 48px;
     max-height: 48px;
+}
+
+.overflow-hiding {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.overflow-hiding:hover {
+    position: relative;
+    left: -1em;
+    top: -1em;
+    padding: 1em;
+    overflow: initial;
+    height: initial;
+    background-color: #ffc;
+    border: 1px #000 dotted;
+    z-index: 1;
+    color: #000 !important;
+    text-shadow: none !important;
 }

@@ -1,5 +1,7 @@
 <?php
 
+require_once('../include/dateconv.php');
+
 try
 {
 	//Open database connection
@@ -20,6 +22,9 @@ try
 		$rows = array();
 		while($row = $result->fetch_assoc())
 		{
+            $row['startTime'] = StringDateTime_UTC_Hongkong($row['startTime']);
+            $row['endTime'] = StringDateTime_UTC_Hongkong($row['endTime']);
+            $row['lastUpdate'] = StringDateTime_UTC_Hongkong($row['lastUpdate']);
 		    $rows[] = $row;
 		}
 
@@ -43,7 +48,9 @@ try
                               VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->bind_param('sssssssss',
             $newID, $_POST["organizerId"], $_POST["locationId"], $_POST["name"], $_POST["description"],
-            $_POST["startTime"], $_POST["endTime"], $_POST["inChargeName"], $_POST["inChargePhone"]);
+            StringDateTime_Hongkong_UTC($_POST["startTime"]),
+            StringDateTime_Hongkong_UTC($_POST["endTime"]),
+            $_POST["inChargeName"], $_POST["inChargePhone"]);
 		if (!$stmt->execute()) throw new Exception($stmt->error);
 
 		//Get last inserted record (to return to jTable)
@@ -66,7 +73,9 @@ try
                               startTime = ?, endTime = ?, inChargeName = ?, inChargePhone = ? WHERE eventId = ?");
         $stmt->bind_param('sssssssss',
             $_POST["organizerId"], $_POST["locationId"], $_POST["name"], $_POST["description"],
-            $_POST["startTime"], $_POST["endTime"], $_POST["inChargeName"], $_POST["inChargePhone"], $_POST['eventId']);
+            StringDateTime_Hongkong_UTC($_POST["startTime"]),
+            StringDateTime_Hongkong_UTC($_POST["endTime"]),
+            $_POST["inChargeName"], $_POST["inChargePhone"], $_POST['eventId']);
         if (!$stmt->execute()) throw new Exception($stmt->error);
 
 		//Return result to jTable
