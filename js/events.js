@@ -59,7 +59,17 @@ $(function() {
                 title: 'Name'
             },
             description: {
-                title: 'Description'
+                title: 'Description',
+                input: function (data) {
+                    var inn = $('<textarea>')
+                        .attr('name', 'description')
+                        .attr('rows', 4)
+                        .attr('cols', 20)
+                        .attr('maxlength', 254)
+                        .appendTo('body');
+                    data && data.record && data.record.description && inn.val(data.record.description);
+                    return inn;
+                }
             },
             startTime: {
                 title: 'Start Time',
